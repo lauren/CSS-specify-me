@@ -93,12 +93,12 @@
 
   var parseSelectors = function (selectors) {
     selectors = selectors.split(/(\s|\*|\+|\~|\<)/);
-    // change each selector into object with ID/class/node property based
-    // on first character, then parse out additional classes or IDs if needed.
-    // we're going from ["node.class", "node#id", "#id.class.class", ".class.class"] to
-    // [{node: 'node', classes: ['.class'}, {node: 'node', id: '#id'}, 
-    // {id: '#id', classes: ['.class', '.class']}, {classes: ['class', '.class']}]
     for (var i = 0; i < selectors.length; i++) {
+      // change each selector into object with ID/class/node property based
+      // on first character, then parse out additional classes or IDs if needed.
+      // we're going from ["node.class", "node#id", "#id.class.class", ".class.class"] to
+      // [{node: 'node', classes: ['.class'}, {node: 'node', id: '#id'}, 
+      // {id: '#id', classes: ['.class', '.class']}, {classes: ['class', '.class']}]
       switch(selectors[i].charAt(0)) {
         case "*": case "+": case "~": case "<": case ">": case "": case " ":
           selectors[i] = {wildcardOrCombinator: selectors[i]};
@@ -110,6 +110,12 @@
         case ".":
           selectors[i] = {classes: findClasses(selectors[i])};
           break;
+        case "[":
+          selectors[i] = {attributes: findAttributes(selectors[i])};
+          break;
+        case ":":
+          selectors[i] = {pseudos: findPseudos(selectors[i])};
+          break;
         default:
           selectors[i] = {node: selectors[i]};
           if (/#/.test(selectors[i].node)) {
@@ -117,56 +123,16 @@
           }
           findClassesInObject(selectors[i]);
       }
+      // parse out attributes, pseudo-elements, and pseudo-classes in each part
+      // of the selector object we constructed
       for (type in selectors[i]) {
-        if (typeof selectors[i][type] === "object") {
-          for (var j = 0; j < selectors[i][type].length; j++) {
-            if (/::/.test(selectors[i][type][j])) {
-              selectors[i].pseudoElement = findPseudoElements(selectors[i][type][j]);
-              selectors[i][type][j] = selectors[i][type][j].split("::")[0];
-              if (/:/.test(selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length))) {
-                selectors[i].pseudos = findPseudos(selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length));
-                selectors[i].pseudoElement = selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length).split(":")[0];
-              }
-              if (/(\[|\])/.test(selectors[i].pseudoElement)) {
-                selectors[i].attributes = findAttributes(selectors[i].pseudoElement);
-                selectors[i].pseudoElement = selectors[i].pseudoElement.split("[")[0];
-              }
-            }
-            if (/:/.test(selectors[i][type][j])) {
-              selectors[i].pseudos = findPseudos(selectors[i][type][j]);
-              selectors[i][type][j] = selectors[i][type][j].split(":")[0];
-            }
-            if (/(\[|\])/.test(selectors[i][type][j])) {
-              selectors[i].attributes = findAttributes(selectors[i][type][j]);
-              selectors[i][type][j] = selectors[i][type][j].split("[")[0];
-            }
-          }
-        } else {
-          if (/::/.test(selectors[i][type])) {
-            selectors[i].pseudoElement = findPseudoElements(selectors[i][type]);
-            selectors[i][type] = selectors[i][type].split("::")[0];
-            if (/:/.test(selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length))) {
-              selectors[i].pseudos = findPseudos(selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length));
-              selectors[i].pseudoElement = selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length).split(":")[0];
-            }
-            if (/(\[|\])/.test(selectors[i].pseudoElement)) {
-              selectors[i].attributes = findAttributes(selectors[i].pseudoElement);
-              selectors[i].pseudoElement = selectors[i].pseudoElement.split("[")[0];
-            }
-          }
-          if (/:/.test(selectors[i][type])) {
-            selectors[i].pseudos = findPseudos(selectors[i][type]);
-            selectors[i][type] = selectors[i][type].split(":")[0];
-          }
-          if (/(\[|\])/.test(selectors[i][type])) {
-            selectors[i].attributes = findAttributes(selectors[i][type]);
-            selectors[i][type] = selectors[i][type].split("[")[0];
-          }
-        }
+        (typeof selectors[i][type] === "object") 
+          ? findPseudosAndAttributesInArray(selectors[i], type)
+          : findPseudosAndAttributesInObject(selectors[i], type);
       }
       validatePseudos(selectors[i]);
     };
-      
+    console.log(selectors);
     return selectors;
   }
 
@@ -229,7 +195,9 @@
       object.pseudoClasses = []
       for (var i = 0; i < object.pseudos.length; i++) {
         if (/(\[|\])/.test(object.pseudos[i])) {
-          object.attributes = findAttributes(object.pseudos[i]);
+          object.attributes = object.attributes
+          ? object.attributes.concat(findAttributes(object.pseudos[i]))
+          : findAttributes(object.pseudos[i]);
           object.pseudos[i] = object.pseudos[i].split("[")[0];
         }
         if (inArray(pseudoElements, ":" + object.pseudos[i])) { 
@@ -264,22 +232,47 @@
     return cleanedAttributes;
   };
 
-  // takes a string and parses out pseudo-elements, pseudo-classes, and attributes
-  // if appropriate
+  // takes a selector object and iterates over array of a given property to find
+  // pseudo-elements, pseudo-classes, and attributes
+  var findPseudosAndAttributesInArray = function (object, property) {
+    for (var i = 0; i < object[property].length; i++) {
+      findPseudosAndAttributesInObject(object,property,i);
+    }
+  };
 
-  var parsePseudosAndAttributes = function (string) {
-    if (/::/.test(string)) {
-      selectors[i].pseudoElement = findPseudoElements(selectors[i][type][j]);
-      selectors[i][type][j] = selectors[i][type][j].split("::")[0];
+  // takes a selector object and parses a given property to find
+  // pseudo-elements, pseudo-classes, and attributes
+  var findPseudosAndAttributesInObject = function (object, property,index) {
+    var currentItem = (typeof index === "number") ? object[property][index] : object[property];
+    if (/::/.test(currentItem)) {
+      object.pseudoElement = findPseudoElements(currentItem);
+      currentItem = currentItem.split("::")[0];
+      if (/:/.test(object.pseudoElement.slice(2,object.pseudoElement.length))) {
+        object.pseudos = object.pseudos
+        ? object.pseudos.concat(findPseudos(object.pseudoElement.slice(2,object.pseudoElement.length)))
+        : findPseudos(object.pseudoElement.slice(2,object.pseudoElement.length));
+        object.pseudoElement = object.pseudoElement.slice(2,object.pseudoElement.length).split(":")[0];
+      }
+      if (/(\[|\])/.test(object.pseudoElement)) {
+        object.attributes = object.attributes 
+          ? object.attributes.concat(findAttributes(object.pseudoElement)) 
+          : findAttributes(object.pseudoElement);
+        object.pseudoElement = object.pseudoElement.split("[")[0];
+      }
     }
-    if (/:/.test(selectors[i][type][j])) {
-      selectors[i].pseudos = findPseudos(selectors[i][type][j]);
-      selectors[i][type][j] = selectors[i][type][j].split(":")[0];
+    if (/:/.test(currentItem) && type !== "pseudos") {
+      object.pseudos = object.pseudos ? object.pseudos.concat(findPseudos(currentItem)) 
+        : findPseudos(currentItem);
+      currentItem = currentItem.split(":")[0];
     }
-    if (/(\[|\])/.test(selectors[i][type][j])) {
-      selectors[i].attributes = findAttributes(selectors[i][type][j]);
-      selectors[i][type][j] = selectors[i][type][j].split("[")[0];
+    if (/(\[|\])/.test(currentItem)) {
+      object.attributes = object.attributes 
+      ? object.attributes.concat(findAttributes(currentItem)) 
+      : findAttributes(currentItem);
+      currentItem = currentItem.split("[")[0];
     }
+    (typeof index === "number") ? object[property][index] = currentItem
+      : object[property] = currentItem;
   };
 
   // because IE doesn't like indexOf
