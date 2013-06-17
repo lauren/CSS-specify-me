@@ -105,6 +105,7 @@
           break;
         case "#":
           selectors[i] = {id: selectors[i]};
+          findClassesInObject(selectors[i]);
           break;
         case ".":
           selectors[i] = {classes: findClasses(selectors[i])};
@@ -114,7 +115,7 @@
           if (/#/.test(selectors[i].node)) {
             selectors[i] = findNodeIds(selectors[i].node);
           }
-      findClassesInObject(selectors[i]);
+          findClassesInObject(selectors[i]);
       }
       for (type in selectors[i]) {
         if (typeof selectors[i][type] === "object") {
@@ -166,75 +167,6 @@
       validatePseudos(selectors[i]);
     };
       
-    // find additional classes and IDs in the main selector to flush out the object
-    // we're going from 
-    // [{node: 'node.class'}, {node: 'node#id'}, {id: #id.class.class}, {classes: ["class.class"]}] to
-    // [{node: "node", classes: [".class"]}, {node: "node", id: "#id"}, 
-    // {id: "#id", classes: [".class", ".class"]}, {classes: [".class", ".class"]}]
-    // for (var i = 0; i < selectors.length; i++) {
-      // for (type in selectors[i]) {
-      //   if (typeof selectors[i][type] === "object") {
-      //     for (var j = 0; j < selectors[i][type].length; j++) {
-      //       if (/::/.test(selectors[i][type][j])) {
-      //         selectors[i].pseudoElement = findPseudoElements(selectors[i][type][j]);
-      //         selectors[i][type][j] = selectors[i][type][j].split("::")[0];
-      //         if (/:/.test(selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length))) {
-      //           selectors[i].pseudos = findPseudos(selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length));
-      //           selectors[i].pseudoElement = selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length).split(":")[0];
-      //         }
-      //         if (/(\[|\])/.test(selectors[i].pseudoElement)) {
-      //           selectors[i].attributes = findAttributes(selectors[i].pseudoElement);
-      //           selectors[i].pseudoElement = selectors[i].pseudoElement.split("[")[0];
-      //         }
-      //       }
-      //       if (/:/.test(selectors[i][type][j])) {
-      //         selectors[i].pseudos = findPseudos(selectors[i][type][j]);
-      //         selectors[i][type][j] = selectors[i][type][j].split(":")[0];
-      //       }
-      //       if (/(\[|\])/.test(selectors[i][type][j])) {
-      //         selectors[i].attributes = findAttributes(selectors[i][type][j]);
-      //         selectors[i][type][j] = selectors[i][type][j].split("[")[0];
-      //       }
-      //     }
-      //   } else {
-      //     if (/::/.test(selectors[i][type])) {
-      //       selectors[i].pseudoElement = findPseudoElements(selectors[i][type]);
-      //       selectors[i][type] = selectors[i][type].split("::")[0];
-      //       if (/:/.test(selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length))) {
-      //         selectors[i].pseudos = findPseudos(selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length));
-      //         selectors[i].pseudoElement = selectors[i].pseudoElement.slice(2,selectors[i].pseudoElement.length).split(":")[0];
-      //       }
-      //       if (/(\[|\])/.test(selectors[i].pseudoElement)) {
-      //         selectors[i].attributes = findAttributes(selectors[i].pseudoElement);
-      //         selectors[i].pseudoElement = selectors[i].pseudoElement.split("[")[0];
-      //       }
-      //     }
-      //     if (/:/.test(selectors[i][type])) {
-      //       selectors[i].pseudos = findPseudos(selectors[i][type]);
-      //       selectors[i][type] = selectors[i][type].split(":")[0];
-      //     }
-      //     if (/(\[|\])/.test(selectors[i][type])) {
-      //       selectors[i].attributes = findAttributes(selectors[i][type]);
-      //       selectors[i][type] = selectors[i][type].split("[")[0];
-      //     }
-      //   }
-      // }
-      // if (selectors[i].pseudos) {
-      //   selectors[i].pseudoClasses = []
-      //   for (var j = 0; j < selectors[i].pseudos.length; j++) {
-      //     if (/(\[|\])/.test(selectors[i].pseudos[j])) {
-      //       selectors[i].attributes = findAttributes(selectors[i].pseudos[j]);
-      //       selectors[i].pseudos[j] = selectors[i].pseudos[j].split("[")[0];
-      //     }
-      //     if (inArray(pseudoElements, ":" + selectors[i].pseudos[j])) { 
-      //       selectors[i].pseudoElement = ":" + selectors[i].pseudos[j];
-      //     } else if (inArray(pseudoClasses, selectors[i].pseudos[j])) {
-      //       selectors[i].pseudoClasses.push(selectors[i].pseudos[j]);
-      //     }
-      //   }
-      //   delete selectors[i].pseudos;
-      // }
-    // };
     return selectors;
   }
 
