@@ -61,6 +61,25 @@
     return specificity;
   };
 
+  var specialCharStripper = function (string) {
+    return (specialCharRegex.test(string.slice(0,1)))
+      ? specialCharStripper(string.slice(1,string.length))
+      : string;
+  };
+
+  var lex = function (s) {
+    s = specialCharStripper(s);
+
+    if (s.length === 0) return [];
+
+    var next = s.slice(1).search(delimiterRegex),
+        next = (next >= 0) ? next + 1 : s.length,
+        token = s.slice(0, next),
+        rest  = s.slice(next);
+
+    return [token].concat(lex(rest));
+  };
+
   // takes a selector string and returns an object with properties for each
   // possible subselector type. the properties will contain an array of all matching
   // selectors.
@@ -75,26 +94,14 @@
       nodes: [],
       wildcardAndCombinators: []
     },
-      parser = function (string) {
-        string = specialCharStripper(string);
-        if (string.length === 0) {
-          return;
-        } else {
-          var type = stringType(string),
-            next = string.slice(1,string.length).search(delimiterRegex),
-            subselector;
-          next = (next >= 0) ? next : string.length;
-          subselector = string.slice(0,next+1);
-          subselectors[type].push(subselector);
-          parser(string.slice(next+1,string.length));
-        }
-      },
-      specialCharStripper = function (string) {
-        return (specialCharRegex.test(string.slice(0,1)))
-        ? specialCharStripper(string.slice(1,string.length))
-        : string;
+      parser = function (array) {
+        if (array.length === 0) return;
+
+        var type = stringType(array[0]);
+        subselectors[type].push(array[0]);
+        parser(array.slice(1));
       };
-    parser(string);
+    parser(lex(string));
     validatePseudos(subselectors);
     return subselectors;
   };
