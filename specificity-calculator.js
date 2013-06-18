@@ -19,8 +19,9 @@
 
   // checks if input is an array of selectors or a single selector and routes it appropriately
   var inputRouter = function (input) {
-    return (typeof input === "string") ? calculateSpecificity(input)
-      : getSpecificities(input);
+    return (typeof input === "string") ?
+      calculateSpecificity(input) :
+      getSpecificities(input);
   };
 
   // takes an array of selectors and returns an array with the specificity of each
