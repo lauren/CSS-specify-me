@@ -14,7 +14,7 @@
                        ":only-of-type", ":empty"],
       pseudoElements = ["::first-line", "::first-letter", "::before", "::after"],
       delimiterRegex = /(\.|#|:|\[|\*|\+|\<|\>|\~|\s)/,
-      specialCharRegex = /(\*|\+|\<|\>|\~|\s)/;
+      specialCharRegex = /^(\*|\+|\<|\>|\~|\s)+/;
 
   // checks if input is an array of selectors or a single selector and routes it appropriately
   var inputRouter = function (input) {
@@ -61,14 +61,12 @@
     return specificity;
   };
 
-  var specialCharStripper = function (string) {
-    return (specialCharRegex.test(string.slice(0,1)))
-      ? specialCharStripper(string.slice(1,string.length))
-      : string;
+  var stripSpecialChars = function (string) {
+    return string.replace(specialCharRegex, "");
   };
 
   var lex = function (s) {
-    s = specialCharStripper(s);
+    s = stripSpecialChars(s);
 
     if (s.length === 0) return [];
 
