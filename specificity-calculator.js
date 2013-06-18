@@ -169,7 +169,8 @@
     return false;
   };
 
-  // Add .map to Array prototype if it doesn't already exist.
+  // Shims
+
   if (Array.prototype.map === undefined) {
     Array.prototype.map = function(fn) {
       var res = [];
@@ -177,6 +178,27 @@
         res.push(fn(this[i]));
       }
       return res;
+    }
+  }
+
+  if (Array.prototype.reduce === undefined) {
+    Array.prototype.reduce = function(fn, acc) {
+      if (this.length === 0 && acc === undefined) {
+        throw new TypeError("Reduce of empty array with no initial value");
+      }
+
+      var i = 0;
+
+      if (acc === undefined) {
+        acc = this[0];
+        i = 1;
+      }
+
+      for (var len=this.length; i < len; i++) {
+        acc = fn(acc, this[i]);
+      }
+
+      return acc;
     }
   }
 
