@@ -1,6 +1,8 @@
 CSS Specify Me
 ==============
 
+[Demo page](http://lauren.github.io/CSS-specify-me/)
+
 A CSS specificity calculator. Accepts a CSS selector as an input and returns an object containing two properties: `score`, the selector's specificity score, and `components`, the pieces of the selector that contributed to each number in the score.
 
 For more on how CSS specificity works, check out [the speficication](http://www.w3.org/TR/css3-selectors/#specificity) or [this great calculator website](http://specificity.keegan.st/).
