@@ -43,6 +43,8 @@ h2 {
   margin:0 auto;
   overflow: hidden;
   text-align: left;
+  max-width: 660px;
+  width: 100%;
   &:focus {
     outline: none;
   }
@@ -61,6 +63,13 @@ h2 {
     font-family: @labelFont;
     &:not(:last-of-type) {
       margin-right:10px;
+    }
+    @media (max-width: 760px) {
+      display: block;
+      width: 99%;
+      &:not(:last-of-type) {
+        margin-bottom: 10px;
+      }
     }
   }
   .label, .score, .components {
