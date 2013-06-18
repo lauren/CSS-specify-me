@@ -26,19 +26,7 @@
 
   // takes an array of selectors and returns an array with the specificity of each
   var getSpecificities = function (array) {
-    var specificities = [],
-        specificityGetter = function (thisArray) {
-          if (thisArray.length === 0) {
-            return specificities;
-          } else {
-            specificities.push(calculateSpecificity(thisArray[0]));
-            if (thisArray.length > 1) {
-              specificityGetter(thisArray.slice(1,thisArray.length));
-            }
-          }
-          return specificities;
-        }
-    return specificityGetter(array);
+    return array.map(calculateSpecificity);
   };
 
   // takes a single selector string, passes to parser, then calculates specificity
@@ -177,6 +165,17 @@
     };
     return false;
   };
+
+  // Add .map to Array prototype if it doesn't already exist.
+  if (Array.prototype.map === undefined) {
+    Array.prototype.map = function(fn) {
+      var res = [];
+      for (var i = 0, len = this.length; i < len; i++) {
+        res.push(fn(this[i]));
+      }
+      return res;
+    }
+  }
 
   exports.specifyMe = inputRouter;
 
