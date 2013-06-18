@@ -138,6 +138,8 @@
         if (/(\(|\))/.test(object.pseudos[i])) {
           var pseudosArray = object.pseudos[i].split(/(\(|\))/g);
           object.pseudos[i] = pseudosArray[0];
+          // XXX: object isn't being passed to findPseudos, which means
+          // findPseudos isn't doing anything.
           findPseudos(pseudosArray.slice(1,pseudosArray.length));
         }
         if (inArray(pseudoElements, ":" + object.pseudos[i])) {
