@@ -14,7 +14,6 @@
                        ":only-of-type", ":empty"],
       pseudoElements = ["::first-line", "::first-letter", "::before", "::after"],
       delimiterRegex = /(\.|#|:|\[|\*|\+|\<|\>|\~|\s)/,
-      idDelimiterRegex = /(\.|:|\[|\*|\+|\<|\>|\~|\s)/,
       specialCharRegex = /(\*|\+|\<|\>|\~|\s)/;
 
   // checks if input is an array of selectors or a single selector and routes it appropriately
@@ -82,9 +81,7 @@
           return;
         } else {
           var type = stringType(string),
-            next = (string.charAt(0) === "#")
-              ? string.slice(1,string.length).search(idDelimiterRegex)
-              : string.slice(1,string.length).search(delimiterRegex),
+            next = string.slice(1,string.length).search(delimiterRegex),
             subselector;
           next = (next >= 0) ? next : string.length;
           subselector = string.slice(0,next+1);
