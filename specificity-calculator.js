@@ -31,34 +31,17 @@
   // takes a single selector string, passes to parser, then calculates specificity
   // of resulting object
   var calculateSpecificity = function (selectors) {
-    var selectorObject = parse(lex(selectors)),
-        specificity = {
-          score: [0,0,0],
-          components: {
-            ids: [],
-            elementsAndPseudoElements: [],
-            classesPseudoClassesAndAttributes: []
-          }
-        };
-    for (type in selectorObject) {
-      switch (type) {
-        case "nodes": case "pseudoElements":
-          specificity.score[2] += selectorObject[type].length;
-          specificity.components.elementsAndPseudoElements =
-            specificity.components.elementsAndPseudoElements.concat(selectorObject[type]);
-          break;
-        case "classes": case "pseudoClasses": case "attributes":
-          specificity.score[1] += selectorObject[type].length;
-          specificity.components.classesPseudoClassesAndAttributes =
-            specificity.components.classesPseudoClassesAndAttributes.concat(selectorObject[type]);
-          break;
-        case "ids":
-          specificity.score[0] += selectorObject[type].length;
-          specificity.components.ids = selectorObject[type];
-          break;
-      }
-    }
-    return specificity;
+    var selectorCatalogue = parse(lex(selectors)),
+        scoreCategories = [
+          ["ids"],
+          ["classes", "pseudoClasses", "attributes"],
+          ["nodes", "pseudoElements"]
+        ];
+
+    selectorCatalogue.score = scoreCategories.map(function (categoryArr) {
+      return selectorCatalogue.getCategories(categoryArr).length;
+    });
+    return selectorCatalogue;
   };
 
   var stripSpecialChars = function (string) {
@@ -79,23 +62,35 @@
     return [token].concat(lex(rest));
   };
 
+  var Catalogue = function () {
+    this.categories = {};
+  };
+
+  Catalogue.prototype = {
+    add: function (name, el) {
+      if (this.categories[name] === undefined) {
+        this.categories[name] = [];
+      }
+      this.categories[name].push(el);
+      return this;
+    },
+    getCategories: function (names) {
+      if (names.length === 0) return [];
+
+      var category = this.categories[names[0]];
+
+      return (category === undefined ? [] : category).
+        concat(this.getCategories(names.slice(1)));
+    }
+  };
+
   // takes an array of tokens (subselectors), and categorizes them
   function parse(tokens) {
-    var categorizedTokens = {
-      ids: [],
-      classes: [],
-      attributes: [],
-      pseudoClasses: [],
-      pseudoElements: [],
-      nodes: [],
-      wildcardAndCombinators: []
-    }
-
     return tokens.reduce(function (acc, token) {
-      acc[stringType(token)].push(token);
+      acc.add(stringType(token), token);
       return acc;
-    }, categorizedTokens);
-  }
+    }, new Catalogue());
+  };
 
   // takes a string and returns what type of selector it is based on the first char
   var stringType = function (string) {
