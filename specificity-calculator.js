@@ -72,7 +72,7 @@
 
     var next = s.slice(1).search(delimiterRegex),
         next = (next >= 0) ? next + 1 : s.length,
-        token = s.slice(0, next),
+        token = s.slice(0, next).replace(/\(|\)/, ""),
         rest  = s.slice(next);
 
     return [token].concat(lex(rest));
@@ -135,13 +135,6 @@
   var validatePseudos = function (object) {
     if (object.pseudos) {
       for (var i = 0; i < object.pseudos.length; i++) {
-        if (/(\(|\))/.test(object.pseudos[i])) {
-          var pseudosArray = object.pseudos[i].split(/(\(|\))/g);
-          object.pseudos[i] = pseudosArray[0];
-          // XXX: object isn't being passed to findPseudos, which means
-          // findPseudos isn't doing anything.
-          findPseudos(pseudosArray.slice(1,pseudosArray.length));
-        }
         if (inArray(pseudoElements, ":" + object.pseudos[i])) {
           object.pseudoElements.push(":" + object.pseudos[i]);
         } else if (inArray(pseudoClasses, object.pseudos[i])) {
@@ -149,15 +142,6 @@
         }
       }
       delete object.pseudos;
-    }
-  };
-
-  // checks an array for pseudos
-  var findPseudos = function (array, object) {
-    for (var i = 0; i < array.length; i++) {
-      if (array[i].charAt[0] === ":") {
-        object.pseudos.push(array[i]);
-      }
     }
   };
 
