@@ -31,7 +31,7 @@
   // takes a single selector string, passes to parser, then calculates specificity
   // of resulting object
   var calculateSpecificity = function (selectors) {
-    var selectorObject = parseSelectors(selectors),
+    var selectorObject = parse(lex(selectors)),
         specificity = {
           score: [0,0,0],
           components: {
@@ -65,6 +65,7 @@
     return string.replace(specialCharRegex, "");
   };
 
+  // takes a selector string and tokenizes it, returning an array of subselectors
   var lex = function (s) {
     s = stripSpecialChars(s);
 
@@ -78,12 +79,12 @@
     return [token].concat(lex(rest));
   };
 
+  // takes an array of tokens (subselectors), and categorizes them
   function parse(tokens) {
     var categorizedTokens = {
       ids: [],
       classes: [],
       attributes: [],
-      pseudos: [],
       pseudoClasses: [],
       pseudoElements: [],
       nodes: [],
@@ -95,15 +96,6 @@
       return acc;
     }, categorizedTokens);
   }
-
-  // takes a selector string and returns an object with properties for each
-  // possible subselector type. the properties will contain an array of all matching
-  // selectors.
-  var parseSelectors = function (string) {
-    var subselectors = parse(lex(string));
-    validatePseudos(subselectors);
-    return subselectors;
-  };
 
   // takes a string and returns what type of selector it is based on the first char
   var stringType = function (string) {
@@ -121,27 +113,11 @@
         return "attributes";
         break;
       case ":":
-        return "pseudos";
+        return string.slice(1, 2) === ":" ? "pseudoElements" : "pseudoClasses";
         break;
       default:
         return "nodes";
         break;
-    }
-  };
-
-  // takes a selector object. parses argument parens and pseudos they contain
-  // out of pseudos if necessary, then checks each pseudo to categorize it as
-  // a pseudo-element or pseudo-class and deletes the irrelevant pseudos property
-  var validatePseudos = function (object) {
-    if (object.pseudos) {
-      for (var i = 0; i < object.pseudos.length; i++) {
-        if (inArray(pseudoElements, ":" + object.pseudos[i])) {
-          object.pseudoElements.push(":" + object.pseudos[i]);
-        } else if (inArray(pseudoClasses, object.pseudos[i])) {
-          object.pseudoClasses.push(object.pseudos[i]);
-        }
-      }
-      delete object.pseudos;
     }
   };
 
