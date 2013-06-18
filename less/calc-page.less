@@ -1,0 +1,75 @@
+@import url(http://reset5.googlecode.com/hg/reset.min.css);
+
+@helveticaNeueLight: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,sans-serif;
+@helveticaNeueUltraLight: "HelveticaNeue-UltraLight","Helvetica Neue UltraLight","HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,sans-serif;
+@bodyFont: @helveticaNeueUltraLight;
+@labelFont: @helveticaNeueLight;
+
+body {
+  text-align: center;
+  font-family: @bodyFont;
+  margin:20px 0px;
+}
+
+footer {
+  font-family: @labelFont;
+  font-size: 16px;
+  margin-top: 50px;
+  line-height: 22px;
+}
+
+h1, h2 {
+  font-family: @bodyFont;
+  font-weight: lighter;
+}
+
+h1 {
+  font-size: 50px;
+  margin-bottom:5px;
+}
+
+h2 {
+  font-size:22px;
+  margin-bottom:20px;
+}
+
+.specify-input {
+  font-family: @bodyFont;
+  font-size: 80px;
+  border:0px;
+  border-bottom: 1px dashed #333;
+  resize: none;
+  height: 95px;
+  margin:0 auto;
+  overflow: hidden;
+  text-align: left;
+  &:focus {
+    outline: none;
+  }
+}
+
+.specificities {
+  max-width: 660px;
+  margin: 10px auto;
+  overflow: hidden;
+  height: auto;
+  .score-component {
+    display: inline-block;
+    width: 30%;
+    border: 1px solid #333;
+    vertical-align: top;
+    font-family: @labelFont;
+    &:not(:last-of-type) {
+      margin-right:10px;
+    }
+  }
+  .label, .score, .components {
+    min-height: 32px;
+    margin: 5px;
+    display: block;
+  }
+  .score {
+    font-size: 50px;
+    font-family: @bodyFont;
+  }
+}

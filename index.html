@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta href="#" name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta href="#" http-equiv="x-ua-compatible" content="IE=10">    
+
+  <link rel="stylesheet" href="css/calc-page.css">
+
+</head>
+
+<body>
+
+  <h1>CSS Specify Me</h1>
+  <h2>Type in a selector to see its specificity score. Check out <a href="https://github.com/lauren/css-specify-me">the source on GitHub</a>.</h2>
+
+  <textarea id="input-one" class="specify-input">h1#header</textarea>
+
+  <div class="specificities">
+    <div class="score-component" id="id-container">
+      <span class="label">IDs</span>
+      <span class="score" id="id-score">0</span>
+      <span class="components" id="id-elements"></span>
+    </div>
+    <div class="score-component" id="classes-container">
+      <span class="label">Classes, Pseudo-Classes, and Attributes</span>
+      <span class="score" id="classes-score">0</span>
+      <span class="components" id="classes-elements"></span>
+    </div>
+    <div class="score-component" id="element-container">
+      <span class="label">Elements and Pseudo-Elements</span>
+      <span class="score" id="elements-score">0</span>
+      <span class="components" id="elements-elements"></span>
+    </div>
+  </div>
+
+  <script src="js/specificity-calculator.min.js"></script>
+  <script src="js/calc-page.js"></script>
+
+  <footer>
+    &copy; 2013 <a href="http://laurensperber">Lauren Sperber</a> | <a href="https://github.com/lauren/css-specify-me">source code</a><br/>
+    Learn more about CSS Specificity in <a href="http://www.w3.org/TR/css3-selectors/#specificity">the spec</a>.<br/>
+    Extremely inspired by <a href="http://keegan.st/">Keegan Street</a>'s amazing <a href="http://specificity.keegan.st/">Specificity Calculator</a>.<br/>
+  </footer>
+
+</body>
+
+</html>

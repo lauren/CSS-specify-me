@@ -1,0 +1,10 @@
+@import url(http://reset5.googlecode.com/hg/reset.min.css);
+body{text-align:center;font-family:"HelveticaNeue-UltraLight","Helvetica Neue UltraLight","HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,sans-serif;margin:20px 0px;}
+footer{font-family:"HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,sans-serif;font-size:16px;margin-top:50px;line-height:22px;}
+h1,h2{font-family:"HelveticaNeue-UltraLight","Helvetica Neue UltraLight","HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,sans-serif;font-weight:lighter;}
+h1{font-size:50px;margin-bottom:5px;}
+h2{font-size:22px;margin-bottom:20px;}
+.specify-input{font-family:"HelveticaNeue-UltraLight","Helvetica Neue UltraLight","HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,sans-serif;font-size:80px;border:0px;border-bottom:1px dashed #333;resize:none;height:95px;margin:0 auto;overflow:hidden;text-align:left;}.specify-input:focus{outline:none;}
+.specificities{max-width:660px;margin:10px auto;overflow:hidden;height:auto;}.specificities .score-component{display:inline-block;width:30%;border:1px solid #333;vertical-align:top;font-family:"HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,sans-serif;}.specificities .score-component:not(:last-of-type){margin-right:10px;}
+.specificities .label,.specificities .score,.specificities .components{min-height:32px;margin:5px;display:block;}
+.specificities .score{font-size:50px;font-family:"HelveticaNeue-UltraLight","Helvetica Neue UltraLight","HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,sans-serif;}
