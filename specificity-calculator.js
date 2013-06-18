@@ -78,11 +78,8 @@
     return [token].concat(lex(rest));
   };
 
-  // takes a selector string and returns an object with properties for each
-  // possible subselector type. the properties will contain an array of all matching
-  // selectors.
-  var parseSelectors = function (string) {
-    var subselectors = {
+  function parse(tokens) {
+    var categorizedTokens = {
       ids: [],
       classes: [],
       attributes: [],
@@ -91,15 +88,19 @@
       pseudoElements: [],
       nodes: [],
       wildcardAndCombinators: []
-    },
-      parser = function (array) {
-        if (array.length === 0) return;
+    }
 
-        var type = stringType(array[0]);
-        subselectors[type].push(array[0]);
-        parser(array.slice(1));
-      };
-    parser(lex(string));
+    return tokens.reduce(function (acc, token) {
+      acc[stringType(token)].push(token);
+      return acc;
+    }, categorizedTokens);
+  }
+
+  // takes a selector string and returns an object with properties for each
+  // possible subselector type. the properties will contain an array of all matching
+  // selectors.
+  var parseSelectors = function (string) {
+    var subselectors = parse(lex(string));
     validatePseudos(subselectors);
     return subselectors;
   };
