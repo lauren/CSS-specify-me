@@ -1,13 +1,13 @@
 // Copyright 2013 Lauren Sperber
 // https://github.com/lauren/specify-me/blob/master/LICENSE
-// 
+//
 // A more efficient way to calculate selector specificity. If you want to preserve the
-// hierarchy of the inputted selectors, try the version called 
+// hierarchy of the inputted selectors, try the version called
 // specificity-calculator-with-hierarchy.js
 
 ;(function (exports) {
   // does not include the :not pseudoclass, which does not contribute to specificity calc
-  var pseudoClasses = [":link", ":visited", ":hover", ":active", ":target", ":lang", ":focus", 
+  var pseudoClasses = [":link", ":visited", ":hover", ":active", ":target", ":lang", ":focus",
                        ":enabled", ":disabled", ":checked", ":indeterminate", ":root", ":nth-child",
                        ":nth-last-child", ":nth-of-type", ":nth-last-of-type", ":first-child",
                        ":last-child", ":first-of-type", ":last-of-type", ":only-child",
@@ -19,7 +19,7 @@
 
   // checks if input is an array of selectors or a single selector and routes it appropriately
   var inputRouter = function (input) {
-    return (typeof input === "string") ? calculateSpecificity(input) 
+    return (typeof input === "string") ? calculateSpecificity(input)
       : getSpecificities(input);
   };
 
@@ -33,7 +33,7 @@
             specificities.push(calculateSpecificity(thisArray[0]));
             if (thisArray.length > 1) {
               specificityGetter(thisArray.slice(1,thisArray.length));
-            } 
+            }
           }
           return specificities;
         }
@@ -56,12 +56,12 @@
       switch (type) {
         case "nodes": case "pseudoElements":
           specificity.score[2] += selectorObject[type].length;
-          specificity.components.elementsAndPseudoElements = 
+          specificity.components.elementsAndPseudoElements =
             specificity.components.elementsAndPseudoElements.concat(selectorObject[type]);
           break;
         case "classes": case "pseudoClasses": case "attributes":
           specificity.score[1] += selectorObject[type].length;
-          specificity.components.classesPseudoClassesAndAttributes = 
+          specificity.components.classesPseudoClassesAndAttributes =
             specificity.components.classesPseudoClassesAndAttributes.concat(selectorObject[type]);
           break;
         case "ids":
@@ -138,7 +138,7 @@
   };
 
   // takes a selector object. parses argument parens and pseudos they contain
-  // out of pseudos if necessary, then checks each pseudo to categorize it as 
+  // out of pseudos if necessary, then checks each pseudo to categorize it as
   // a pseudo-element or pseudo-class and deletes the irrelevant pseudos property
   var validatePseudos = function (object) {
     if (object.pseudos) {
@@ -148,7 +148,7 @@
           object.pseudos[i] = pseudosArray[0];
           findPseudos(pseudosArray.slice(1,pseudosArray.length));
         }
-        if (inArray(pseudoElements, ":" + object.pseudos[i])) { 
+        if (inArray(pseudoElements, ":" + object.pseudos[i])) {
           object.pseudoElements.push(":" + object.pseudos[i]);
         } else if (inArray(pseudoClasses, object.pseudos[i])) {
           object.pseudoClasses.push(object.pseudos[i]);
