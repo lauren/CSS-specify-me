@@ -26,11 +26,11 @@
   // takes a single selector string, passes to getComponentSelectors and categorize,
   // calculates specificity of resulting object, adds a score property, and returns it
   var calculateSpecificity = function (selectors) {
-    var selectorCatalogue = categorize(getComponentSelectors(selectors));
-    selectorCatalogue.score = [selectorCatalogue.components.ids.length, 
-                              selectorCatalogue.components.classesPseudoClassesAndAttributes.length,
-                              selectorCatalogue.components.elementsAndPseudoElements.length]
-    return selectorCatalogue;
+    var specificityInfo = categorize(getComponentSelectors(selectors));
+    specificityInfo.score = [specificityInfo.components.ids.length, 
+                              specificityInfo.components.classesPseudoClassesAndAttributes.length,
+                              specificityInfo.components.elementsAndPseudoElements.length]
+    return specificityInfo;
   };
 
   // takes a selector string and returns an array of its component selectors
@@ -56,10 +56,10 @@
     return selectors.reduce(function (accumulator, selector) {
       accumulator.components[selectorCategory(selector)].push(selector);
       return accumulator;
-    }, new Catalogue());
+    }, new specificityInfo());
   };
 
-  var Catalogue = function () {
+  var specificityInfo = function () {
     this.components = {
       ids: [],
       classesPseudoClassesAndAttributes: [],
