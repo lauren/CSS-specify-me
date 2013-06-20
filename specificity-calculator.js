@@ -67,6 +67,18 @@
     };
   };
 
+  // makes sure that xs is a subset of ys. If there are elements that are in xs but not ys, 
+  // makeSubset removees them and returns the resulting array, which IS a subset of ys.
+  var makeSubset = function (xs, ys) {
+    var result = [];
+    xs.map(function (item) {
+      if (ys.indexOf(item) !== -1) {
+        result.push(item);
+      }
+    });
+    return result;
+  }
+
   // takes a selector and returns what category it belongs in based on the first char
   var selectorCategory = function (selector) {
     switch(selector.charAt(0)) {
@@ -130,5 +142,6 @@
   }
 
   exports.specifyMe = inputRouter;
+  exports.makeSubset = makeSubset;
 
 })(this);
