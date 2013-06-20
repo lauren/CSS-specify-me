@@ -111,46 +111,47 @@
     }
   };
 
-  // because IE doesn't like indexOf
-  var inArray = function (array,object) {
-    for (var i = 0; i < array.length; i++) {
-      if(array[i] === object) {
-          return true;
-      }
-    };
-    return false;
-  };
-
   // Shims
 
+  if (Array.prototype.indexOf === undefined) {
+    var inArray = function (array,object) {
+      for (var i = 0; i < array.length; i++) {
+        if(array[i] === object) {
+            return i;
+        }
+      };
+      return -1;
+    };
+  }
+
   if (Array.prototype.map === undefined) {
-    Array.prototype.map = function(fn) {
-      var res = [];
-      for (var i = 0, len = this.length; i < len; i++) {
-        res.push(fn(this[i]));
+    Array.prototype.map = function(thisFunction) {
+      var result = [];
+      for (var i = 0; i < this.length; i++) {
+        result.push(thisFunction(this[i]));
       }
-      return res;
+      return result;
     }
   }
 
   if (Array.prototype.reduce === undefined) {
-    Array.prototype.reduce = function(fn, acc) {
-      if (this.length === 0 && acc === undefined) {
-        throw new TypeError("Reduce of empty array with no initial value");
+    Array.prototype.reduce = function(thisFunction, accumulator) {
+      if (this.length === 0 && accumulator === undefined) {
+        throw new TypeError("Can't reduce an empty array with no initial value");
       }
 
       var i = 0;
 
-      if (acc === undefined) {
-        acc = this[0];
+      if (accumulator === undefined) {
+        accumulator = this[0];
         i = 1;
       }
 
       for (var len=this.length; i < len; i++) {
-        acc = fn(acc, this[i]);
+        accumulator = thisFunction(accumulator, this[i]);
       }
 
-      return acc;
+      return accumulator;
     }
   }
 
