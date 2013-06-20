@@ -26,7 +26,7 @@
   // takes a single selector string, passes to parser, then calculates specificity
   // of resulting object
   var calculateSpecificity = function (selectors) {
-    var selectorCatalogue = parse(getComponentSelectors(selectors)),
+    var selectorCatalogue = categorize(getComponentSelectors(selectors)),
         scoreCategories = [
           ["ids"],
           ["classes", "pseudoClasses", "attributes"],
@@ -78,20 +78,17 @@
     }
   };
 
-  // takes an array of tokens (subselectors), and categorizes them
-  function parse(tokens) {
-    return tokens.reduce(function (acc, token) {
-      acc.add(stringType(token), token);
-      return acc;
+  // takes an array selectors and categorizes them
+  function categorize (selectors) {
+    return selectors.reduce(function (accumulator, selector) {
+      accumulator.add(selectorType(selector), selector);
+      return accumulator;
     }, new Catalogue());
   };
 
-  // takes a string and returns what type of selector it is based on the first char
-  var stringType = function (string) {
-    switch(string.charAt(0)) {
-      case "*": case "+": case "~": case "<": case ">":
-        return "wildcardAndCombinators";
-        break;
+  // takes a selector and returns what type of selector it is based on the first char
+  var selectorType = function (selector) {
+    switch(selector.charAt(0)) {
       case "#":
         return "ids";
         break;
