@@ -89,14 +89,6 @@
       console.log(this.components);
       this.components[name].push(el);
       return this;
-    },
-    getCategories: function (names) {
-      if (names.length === 0) return [];
-
-      var category = this.components[names[0]];
-
-      return (category === undefined ? [] : category).
-        concat(this.getCategories(names.slice(1)));
     }
   };
 
