@@ -99,7 +99,7 @@
         return "attributes";
         break;
       case ":":
-        return string.slice(1, 2) === ":" ? "pseudoElements" : "pseudoClasses";
+        return selector.slice(1, 2) === ":" ? "pseudoElements" : "pseudoClasses";
         break;
       default:
         return "nodes";
