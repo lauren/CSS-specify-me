@@ -53,18 +53,43 @@
 
   // takes an array selectors and categorizes them
   var categorize = function (selectors) {
-    return selectors.reduce(function (accumulator, selector) {
+    specificityInfo = selectors.reduce(function (accumulator, selector) {
       accumulator.components[selectorCategory(selector)].push(selector);
       return accumulator;
     }, new SpecificityInfo());
+    specificityInfo.findPseudoElements();
+    specificityInfo.validatePseudoClasses();
+    return specificityInfo;
   };
 
+  // SpecificityInfo constructor
   var SpecificityInfo = function () {
     this.components = {
       ids: [],
       classesPseudoClassesAndAttributes: [],
-      elementsAndPseudoElements: []
+      elementsAndPseudoElements: [],
+      pseudoClasses: [] // temporary bucket for pseudo-classes until they're scrubbed for psuedo-elements and :not
     };
+  };
+
+  // if any pseudo-classes match the acceptable pseudo-elements array, recategorize them 
+  // as pseudoElements.
+  SpecificityInfo.prototype.findPseudoElements = function () {
+    var thisObj = this; // otherwise starting a new function resets this to the window
+    this.components.pseudoClasses.map(function (selector) {
+      if (pseudoElements.indexOf(":" + selector) !== -1) {
+        thisObj.components.elementsAndPseudoElements.push(":" + selector);
+      }
+    });
+  };
+
+  // make sure SpecificityInfo.components.pseudoClasses is a subset of the acceptable
+  // pseudo-classes array, then add all the pseudo-classes to classesPseudoClasseAndAttributes
+  // and delete the pseudoClasses property.
+  SpecificityInfo.prototype.validatePseudoClasses = function () {
+    this.components.classesPseudoClassesAndAttributes
+      .concat(makeSubset(this.components.pseudoClasses, pseudoClasses));
+    delete this.components.pseudoClasses;
   };
 
   // makes sure that xs is a subset of ys. If there are elements that are in xs but not ys, 
@@ -77,7 +102,7 @@
       }
     });
     return result;
-  }
+  };
 
   // takes a selector and returns what category it belongs in based on the first char
   var selectorCategory = function (selector) {
@@ -89,7 +114,7 @@
         return "classesPseudoClassesAndAttributes";
         break;
       case ":":
-        return selector.slice(1, 2) === ":" ? "elementsAndPseudoElements" : "classesPseudoClassesAndAttributes";
+        return selector.slice(1, 2) === ":" ? "elementsAndPseudoElements" : "pseudoClasses";
         break;
       default:
         return "elementsAndPseudoElements";
@@ -97,7 +122,7 @@
     }
   };
 
-  // shims
+  //// shims
 
   if (Array.prototype.indexOf === undefined) {
     var inArray = function (array,object) {
@@ -108,7 +133,7 @@
       };
       return -1;
     };
-  }
+  };
 
   if (Array.prototype.map === undefined) {
     Array.prototype.map = function(thisFunction) {
@@ -118,7 +143,7 @@
       }
       return result;
     }
-  }
+  };
 
   if (Array.prototype.reduce === undefined) {
     Array.prototype.reduce = function(thisFunction, accumulator) {
@@ -139,9 +164,8 @@
 
       return accumulator;
     }
-  }
+  };
 
   exports.specifyMe = inputRouter;
-  exports.makeSubset = makeSubset;
 
 })(this);
