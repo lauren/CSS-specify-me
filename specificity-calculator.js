@@ -1,9 +1,8 @@
 // Copyright 2013 Lauren Sperber
 // https://github.com/lauren/specify-me/blob/master/LICENSE
 //
-// A more efficient way to calculate selector specificity. If you want to preserve the
-// hierarchy of the inputted selectors, try the version called
-// specificity-calculator-with-hierarchy.js
+// If you want to preserve the hierarchy of the inputted selectors, check out 
+// /alt/specificity-calculator-with-hierarchy.js
 
 ;(function (exports) {
   // does not include the :not pseudoclass, which does not contribute to specificity calc
