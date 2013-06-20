@@ -14,7 +14,7 @@
                        ":only-of-type", ":empty"],
       pseudoElements = ["::first-line", "::first-letter", "::before", "::after"],
       delimiterRegex = /(\.|#|:|\[|\*|\+|\<|\>|\~|\s)/,
-      specialCharRegex = /^(\*|\+|\<|\>|\~|\s)+/;
+      specialCharRegex = /^(\*|\+|\<|\>|\~|\s|\(|\))+/;
 
   // checks if input is an array of selectors or a single selector and routes it appropriately
   var inputRouter = function (input) {
@@ -26,7 +26,7 @@
   // takes a single selector string, passes to parser, then calculates specificity
   // of resulting object
   var calculateSpecificity = function (selectors) {
-    var selectorCatalogue = parse(lex(selectors)),
+    var selectorCatalogue = parse(getComponentSelectors(selectors)),
         scoreCategories = [
           ["ids"],
           ["classes", "pseudoClasses", "attributes"],
@@ -39,22 +39,21 @@
     return selectorCatalogue;
   };
 
-  var stripSpecialChars = function (string) {
-    return string.replace(specialCharRegex, "");
-  };
+  // takes a selector string and returns an array of its component selectors
+  var getComponentSelectors = function (string) {
+    string = string.replace(specialCharRegex, "");
 
-  // takes a selector string and tokenizes it, returning an array of subselectors
-  var lex = function (s) {
-    s = stripSpecialChars(s);
+    if (string.length === 0) {
+      return [];
+    }
 
-    if (s.length === 0) return [];
+    var nextSelectorIndex = /^[\:\:]/.test(string) ? string.slice(2).search(delimiterRegex) 
+          : string.slice(1).search(delimiterRegex),
+        nextSelectorIndex = (nextSelectorIndex >= 0) ? nextSelectorIndex + 1 : string.length,
+        thisSelector = string.slice(0,nextSelectorIndex),
+        remainingString = string.slice(nextSelectorIndex);
 
-    var next = s.slice(1).search(delimiterRegex),
-        next = (next >= 0) ? next + 1 : s.length,
-        token = s.slice(0, next).replace(/\(|\)/, ""),
-        rest  = s.slice(next);
-
-    return [token].concat(lex(rest));
+    return [thisSelector].concat(getComponentSelectors(remainingString));
   };
 
   var Catalogue = function () {
