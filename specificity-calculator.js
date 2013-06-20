@@ -44,8 +44,9 @@
     // special case for selectors that begin "::" so the first colon doesn't get split off
     var nextSelectorIndex = /^[\:\:]/.test(string) ? string.slice(2).search(delimiterRegex) 
           : string.slice(1).search(delimiterRegex),
-        nextSelectorIndex = (nextSelectorIndex >= 0) ? nextSelectorIndex + 1 : string.length,
-        thisSelector = string.slice(0,nextSelectorIndex),
+        selectorIndexBuffer = /^[\:\:]/.test(string) ? 2 : 1;
+    nextSelectorIndex = (nextSelectorIndex >= 0) ? nextSelectorIndex + selectorIndexBuffer : string.length;
+    var thisSelector = string.slice(0,nextSelectorIndex),
         remainingString = string.slice(nextSelectorIndex);
 
     return [thisSelector].concat(getComponentSelectors(remainingString));
