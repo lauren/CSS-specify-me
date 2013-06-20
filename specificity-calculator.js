@@ -23,19 +23,13 @@
       input.map(calculateSpecificity);
   };
 
-  // takes a single selector string, passes to parser, then calculates specificity
-  // of resulting object
+  // takes a single selector string, passes to getComponentSelectors and categorize,
+  // calculates specificity of resulting object, adds a score property, and returns it
   var calculateSpecificity = function (selectors) {
-    var selectorCatalogue = categorize(getComponentSelectors(selectors)),
-        scoreCategories = [
-          ["ids"],
-          ["classes", "pseudoClasses", "attributes"],
-          ["nodes", "pseudoElements"]
-        ];
-
-    selectorCatalogue.score = scoreCategories.map(function (categoryArr) {
-      return selectorCatalogue.getCategories(categoryArr).length;
-    });
+    var selectorCatalogue = categorize(getComponentSelectors(selectors));
+    selectorCatalogue.score = [selectorCatalogue.components.ids.length, 
+                              selectorCatalogue.components.classesPseudoClassesAndAttributes.length,
+                              selectorCatalogue.components.elementsAndPseudoElements.length]
     return selectorCatalogue;
   };
 
@@ -59,48 +53,47 @@
   // takes an array selectors and categorizes them
   function categorize (selectors) {
     return selectors.reduce(function (accumulator, selector) {
-      accumulator.add(selectorType(selector), selector);
+      accumulator.add(selectorCategory(selector), selector);
       return accumulator;
     }, new Catalogue());
   };
   
   // takes a selector and returns what category it belongs in based on the first char
-  var selectorType = function (selector) {
+  var selectorCategory = function (selector) {
     switch(selector.charAt(0)) {
       case "#":
         return "ids";
         break;
-      case ".":
-        return "classes";
-        break;
-      case "[":
-        return "attributes";
+      case ".": case "[":
+        return "classesPseudoClassesAndAttributes";
         break;
       case ":":
-        return selector.slice(1, 2) === ":" ? "pseudoElements" : "pseudoClasses";
+        return selector.slice(1, 2) === ":" ? "elementsAndPseudoElements" : "classesPseudoClassesAndAttributes";
         break;
       default:
-        return "nodes";
+        return "elementsAndPseudoElements";
         break;
     }
   };
 
   var Catalogue = function () {
-    this.categories = {};
+    this.components = {
+      ids: [],
+      classesPseudoClassesAndAttributes: [],
+      elementsAndPseudoElements: []
+    };
   };
 
   Catalogue.prototype = {
     add: function (name, el) {
-      if (this.categories[name] === undefined) {
-        this.categories[name] = [];
-      }
-      this.categories[name].push(el);
+      console.log(this.components);
+      this.components[name].push(el);
       return this;
     },
     getCategories: function (names) {
       if (names.length === 0) return [];
 
-      var category = this.categories[names[0]];
+      var category = this.components[names[0]];
 
       return (category === undefined ? [] : category).
         concat(this.getCategories(names.slice(1)));
