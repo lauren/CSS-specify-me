@@ -57,7 +57,23 @@
       return accumulator;
     }, new Catalogue());
   };
-  
+
+  var Catalogue = function () {
+    this.components = {
+      ids: [],
+      classesPseudoClassesAndAttributes: [],
+      elementsAndPseudoElements: []
+    };
+  };
+
+  Catalogue.prototype = {
+    add: function (name, el) {
+      console.log(this.components);
+      this.components[name].push(el);
+      return this;
+    }
+  };
+
   // takes a selector and returns what category it belongs in based on the first char
   var selectorCategory = function (selector) {
     switch(selector.charAt(0)) {
@@ -73,22 +89,6 @@
       default:
         return "elementsAndPseudoElements";
         break;
-    }
-  };
-
-  var Catalogue = function () {
-    this.components = {
-      ids: [],
-      classesPseudoClassesAndAttributes: [],
-      elementsAndPseudoElements: []
-    };
-  };
-
-  Catalogue.prototype = {
-    add: function (name, el) {
-      console.log(this.components);
-      this.components[name].push(el);
-      return this;
     }
   };
 
