@@ -14,7 +14,7 @@
                        ":only-of-type", ":empty"],
       pseudoElements = ["::first-line", "::first-letter", "::before", "::after"],
       delimiterRegex = /(\.|#|:|\[|\*|\+|\<|\>|\~|\s)/,
-      specialCharRegex = /^(\*|\+|\<|\>|\~|\s|\(|\))+/;
+      specialCharRegex = /^(\*|\+|\<|\>|\~|\s|\()+/;
 
   // checks if input is an array of selectors or a single selector and routes it appropriately
   var inputRouter = function (input) {
@@ -36,7 +36,7 @@
   // takes a selector string and returns an array of its component selectors
   var getComponentSelectors = function (string) {
     string = string.replace(specialCharRegex, "");
-
+    string = string.replace(")","");
     if (string.length === 0) {
       return [];
     }
@@ -53,12 +53,20 @@
 
   // takes an array selectors and categorizes them
   var categorize = function (selectors) {
+    var specificityInfo = {
+      components: {
+        ids: [],
+        classesPseudoClassesAndAttributes: [],
+        elementsAndPseudoElements: [],
+        pseudoClasses: [] // temp bucket for pseudo-classes until they're scrubbed for psuedo-elements and :not
+      }
+    };
     specificityInfo = selectors.reduce(function (accumulator, selector) {
       accumulator.components[selectorCategory(selector)].push(selector);
       return accumulator;
-    }, new SpecificityInfo());
-    specificityInfo.findPseudoElements();
-    specificityInfo.validatePseudoClasses();
+    }, specificityInfo);
+    findPseudoElements(specificityInfo);
+    validatePseudoClasses(specificityInfo);
     return specificityInfo;
   };
 
@@ -74,22 +82,19 @@
 
   // if any pseudo-classes match the acceptable pseudo-elements array, recategorize them 
   // as pseudoElements.
-  SpecificityInfo.prototype.findPseudoElements = function () {
-    var thisObj = this; // otherwise starting a new function resets this to the window
-    this.components.pseudoClasses.map(function (selector) {
+  var findPseudoElements = function (specificityObject) {
+    specificityObject.components.pseudoClasses.map(function (selector) {
       if (pseudoElements.indexOf(":" + selector) !== -1) {
-        thisObj.components.elementsAndPseudoElements.push(":" + selector);
+        specificityObject.components.elementsAndPseudoElements.push(":" + selector);
       }
     });
   };
 
-  // make sure SpecificityInfo.components.pseudoClasses is a subset of the acceptable
-  // pseudo-classes array, then add all the pseudo-classes to classesPseudoClasseAndAttributes
-  // and delete the pseudoClasses property.
-  SpecificityInfo.prototype.validatePseudoClasses = function () {
-    this.components.classesPseudoClassesAndAttributes
-      .concat(makeSubset(this.components.pseudoClasses, pseudoClasses));
-    delete this.components.pseudoClasses;
+  var validatePseudoClasses = function (specificityObject) {
+    specificityObject.components.classesPseudoClassesAndAttributes  = 
+      specificityObject.components.classesPseudoClassesAndAttributes
+      .concat(makeSubset(specificityObject.components.pseudoClasses, pseudoClasses));
+    delete specificityObject.components.pseudoClasses;
   };
 
   // makes sure that xs is a subset of ys. If there are elements that are in xs but not ys, 
