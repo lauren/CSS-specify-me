@@ -63,6 +63,27 @@
       return accumulator;
     }, new Catalogue());
   };
+  
+  // takes a selector and returns what category it belongs in based on the first char
+  var selectorType = function (selector) {
+    switch(selector.charAt(0)) {
+      case "#":
+        return "ids";
+        break;
+      case ".":
+        return "classes";
+        break;
+      case "[":
+        return "attributes";
+        break;
+      case ":":
+        return selector.slice(1, 2) === ":" ? "pseudoElements" : "pseudoClasses";
+        break;
+      default:
+        return "nodes";
+        break;
+    }
+  };
 
   var Catalogue = function () {
     this.categories = {};
@@ -83,27 +104,6 @@
 
       return (category === undefined ? [] : category).
         concat(this.getCategories(names.slice(1)));
-    }
-  };
-
-  // takes a selector and returns what type of selector it is based on the first char
-  var selectorType = function (selector) {
-    switch(selector.charAt(0)) {
-      case "#":
-        return "ids";
-        break;
-      case ".":
-        return "classes";
-        break;
-      case "[":
-        return "attributes";
-        break;
-      case ":":
-        return selector.slice(1, 2) === ":" ? "pseudoElements" : "pseudoClasses";
-        break;
-      default:
-        return "nodes";
-        break;
     }
   };
 
