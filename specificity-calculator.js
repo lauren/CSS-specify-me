@@ -56,6 +56,14 @@
     return [thisSelector].concat(getComponentSelectors(remainingString));
   };
 
+  // takes an array selectors and categorizes them
+  function categorize (selectors) {
+    return selectors.reduce(function (accumulator, selector) {
+      accumulator.add(selectorType(selector), selector);
+      return accumulator;
+    }, new Catalogue());
+  };
+
   var Catalogue = function () {
     this.categories = {};
   };
@@ -76,14 +84,6 @@
       return (category === undefined ? [] : category).
         concat(this.getCategories(names.slice(1)));
     }
-  };
-
-  // takes an array selectors and categorizes them
-  function categorize (selectors) {
-    return selectors.reduce(function (accumulator, selector) {
-      accumulator.add(selectorType(selector), selector);
-      return accumulator;
-    }, new Catalogue());
   };
 
   // takes a selector and returns what type of selector it is based on the first char
