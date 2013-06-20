@@ -20,12 +20,7 @@
   var inputRouter = function (input) {
     return (typeof input === "string") ?
       calculateSpecificity(input) :
-      getSpecificities(input);
-  };
-
-  // takes an array of selectors and returns an array with the specificity of each
-  var getSpecificities = function (array) {
-    return array.map(calculateSpecificity);
+      input.map(calculateSpecificity);
   };
 
   // takes a single selector string, passes to parser, then calculates specificity
