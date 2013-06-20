@@ -53,7 +53,7 @@
   // takes an array selectors and categorizes them
   function categorize (selectors) {
     return selectors.reduce(function (accumulator, selector) {
-      accumulator.add(selectorCategory(selector), selector);
+      accumulator.components[selectorCategory(selector)].push(selector);
       return accumulator;
     }, new Catalogue());
   };
@@ -64,14 +64,6 @@
       classesPseudoClassesAndAttributes: [],
       elementsAndPseudoElements: []
     };
-  };
-
-  Catalogue.prototype = {
-    add: function (name, el) {
-      console.log(this.components);
-      this.components[name].push(el);
-      return this;
-    }
   };
 
   // takes a selector and returns what category it belongs in based on the first char
