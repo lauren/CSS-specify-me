@@ -56,10 +56,10 @@
     return selectors.reduce(function (accumulator, selector) {
       accumulator.components[selectorCategory(selector)].push(selector);
       return accumulator;
-    }, new specificityInfo());
+    }, new SpecificityInfo());
   };
 
-  var specificityInfo = function () {
+  var SpecificityInfo = function () {
     this.components = {
       ids: [],
       classesPseudoClassesAndAttributes: [],
