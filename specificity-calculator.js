@@ -5,6 +5,7 @@
 // /alt/specificity-calculator-with-hierarchy.js
 
 ;(function (exports) {
+
   // does not include the :not pseudoclass, which does not contribute to specificity calc
   var pseudoClasses = [":link", ":visited", ":hover", ":active", ":target", ":lang", ":focus",
                        ":enabled", ":disabled", ":checked", ":indeterminate", ":root", ":nth-child",
@@ -40,6 +41,7 @@
       return [];
     }
 
+    // special case for selectors that begin "::" so the first colon doesn't get split off
     var nextSelectorIndex = /^[\:\:]/.test(string) ? string.slice(2).search(delimiterRegex) 
           : string.slice(1).search(delimiterRegex),
         nextSelectorIndex = (nextSelectorIndex >= 0) ? nextSelectorIndex + 1 : string.length,
@@ -50,7 +52,7 @@
   };
 
   // takes an array selectors and categorizes them
-  function categorize (selectors) {
+  var categorize = function (selectors) {
     return selectors.reduce(function (accumulator, selector) {
       accumulator.components[selectorCategory(selector)].push(selector);
       return accumulator;
@@ -83,7 +85,7 @@
     }
   };
 
-  // Shims
+  // shims
 
   if (Array.prototype.indexOf === undefined) {
     var inArray = function (array,object) {
